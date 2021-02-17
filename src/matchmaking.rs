@@ -33,16 +33,8 @@ pub fn balance<F: Float>(env: &TrueSkill<F>, players: &[Rating<F>]) -> (Vec<usiz
             if check { &mut team1 } else { &mut team2 }.push(i);
         }
         let quality = env.quality(
-            &team1
-                .iter()
-                .copied()
-                .map(|x| players[x])
-                .collect::<Vec<_>>(),
-            &team2
-                .iter()
-                .copied()
-                .map(|x| players[x])
-                .collect::<Vec<_>>(),
+            &team1.iter().map(|&x| players[x]).collect::<Vec<_>>(),
+            &team2.iter().map(|&x| players[x]).collect::<Vec<_>>(),
         );
         if quality > best_quality {
             best_quality = quality;

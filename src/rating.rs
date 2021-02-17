@@ -1,6 +1,6 @@
 use num_traits::Float;
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct Rating<F>
 where
     F: Float,

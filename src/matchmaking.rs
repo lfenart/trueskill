@@ -41,5 +41,5 @@ pub fn balance<F: Float>(env: &TrueSkill<F>, players: &[Rating<F>]) -> (Vec<usiz
             best_teams = Some((team1, team2));
         }
     }
-    best_teams.unwrap()
+    best_teams.unwrap_or((vec![], vec![]))
 }

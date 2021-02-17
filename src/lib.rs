@@ -4,16 +4,21 @@ mod update;
 
 pub use rating::Rating;
 
+use num_traits::Float;
+
 #[derive(Debug, Clone, PartialEq)]
-pub struct TrueSkill {
-    mu: f32,
-    sigma: f32,
-    beta: f32,
-    tau: f32,
-    draw_probability: f32,
+pub struct TrueSkill<F>
+where
+    F: Float,
+{
+    mu: F,
+    sigma: F,
+    beta: F,
+    tau: F,
+    draw_probability: F,
 }
 
-impl Eq for TrueSkill {}
+impl<F: Float> Eq for TrueSkill<F> {}
 
 #[derive(Clone, Copy, Hash, Debug, PartialEq, Eq)]
 pub enum Score {
@@ -22,8 +27,8 @@ pub enum Score {
     Draw,
 }
 
-impl TrueSkill {
-    pub const fn new(mu: f32, sigma: f32, beta: f32, tau: f32, draw_probability: f32) -> Self {
+impl<F: Float> TrueSkill<F> {
+    pub fn new(mu: F, sigma: F, beta: F, tau: F, draw_probability: F) -> Self {
         Self {
             mu,
             sigma,
@@ -33,36 +38,36 @@ impl TrueSkill {
         }
     }
 
-    pub const fn beta(&self) -> f32 {
+    pub fn beta(&self) -> F {
         self.beta
     }
 
-    pub const fn tau(&self) -> f32 {
+    pub fn tau(&self) -> F {
         self.tau
     }
 
-    pub const fn draw_probability(&self) -> f32 {
+    pub fn draw_probability(&self) -> F {
         self.draw_probability
     }
 
-    pub const fn create_rating(&self) -> Rating {
+    pub fn create_rating(&self) -> Rating<F> {
         Rating::new(self.mu, self.sigma)
     }
 
-    pub fn quality(&self, team1: &[Rating], team2: &[Rating]) -> f32 {
+    pub fn quality(&self, team1: &[Rating<F>], team2: &[Rating<F>]) -> F {
         matchmaking::quality(self, team1, team2)
     }
 
-    pub fn balance(&self, players: &[Rating]) -> (Vec<usize>, Vec<usize>) {
+    pub fn balance(&self, players: &[Rating<F>]) -> (Vec<usize>, Vec<usize>) {
         matchmaking::balance(self, players)
     }
 
     pub fn update(
         &self,
-        team1: &[Rating],
-        team2: &[Rating],
+        team1: &[Rating<F>],
+        team2: &[Rating<F>],
         score: Score,
-    ) -> (Vec<Rating>, Vec<Rating>) {
+    ) -> (Vec<Rating<F>>, Vec<Rating<F>>) {
         update::update(self, team1, team2, score)
     }
 }
@@ -71,12 +76,19 @@ impl TrueSkill {
 mod tests {
     use super::*;
 
-    fn env() -> TrueSkill {
-        return TrueSkill::new(25., 25. / 3., 25. / 6., 25. / 300., 0.1);
+    fn env<F: Float>() -> TrueSkill<F> {
+        return TrueSkill::new(
+            F::from(25).unwrap(),
+            F::from(25f32 / 3f32).unwrap(),
+            F::from(25f32 / 6f32).unwrap(),
+            F::from(25f32 / 300f32).unwrap(),
+            F::from(0.1).unwrap(),
+        );
     }
 
-    fn check_rating(rating: Rating, (mu, sigma): (f32, f32)) -> bool {
-        (rating.mu() - mu).abs() < 0.001 && (rating.sigma() - sigma).abs() < 0.001
+    fn check_rating<F: Float>(rating: Rating<F>, (mu, sigma): (F, F)) -> bool {
+        (rating.mu() - mu).abs() < F::from(0.001).unwrap()
+            && (rating.sigma() - sigma).abs() < F::from(0.001).unwrap()
     }
 
     #[test]

@@ -8,4 +8,5 @@ version = "0.1.0"
 
 [dependencies]
 itertools = "0.10"
+num-traits = "0.2"
 statrs = "0.13"

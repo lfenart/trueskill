@@ -1,34 +1,39 @@
+use num_traits::Float;
+
 #[derive(Clone, Copy, Debug)]
-pub struct Rating {
-    mu: f32,
-    sigma: f32,
+pub struct Rating<F>
+where
+    F: Float,
+{
+    mu: F,
+    sigma: F,
 }
 
-impl Rating {
-    pub const fn new(mu: f32, sigma: f32) -> Self {
+impl<F: Float> Rating<F> {
+    pub fn new(mu: F, sigma: F) -> Self {
         Self { mu, sigma }
     }
 
-    pub const fn mu(&self) -> f32 {
+    pub fn mu(&self) -> F {
         self.mu
     }
 
-    pub const fn sigma(&self) -> f32 {
+    pub fn sigma(&self) -> F {
         self.sigma
     }
 }
 
-impl<T> From<T> for Rating
+impl<T, F: Float> From<T> for Rating<F>
 where
-    T: std::convert::AsRef<[Rating]>,
+    T: std::convert::AsRef<[Rating<F>]>,
 {
-    fn from(team: T) -> Rating {
-        let (mu, sigma2) = team
-            .as_ref()
-            .iter()
-            .fold((0., 0.), |(mu, sigma2), x: &Rating| {
-                (mu + x.mu(), sigma2 + x.sigma().powf(2f32))
-            });
-        Rating::new(mu, sigma2.sqrt())
+    fn from(team: T) -> Rating<F> {
+        let (mu, sigma2) =
+            team.as_ref()
+                .iter()
+                .fold((F::zero(), F::zero()), |(mu, sigma2), x: &Rating<F>| {
+                    (mu + x.mu(), sigma2 + x.sigma().powf(F::from(2.).unwrap()))
+                });
+        Rating::new(F::from(mu).unwrap(), F::from(sigma2.sqrt()).unwrap())
     }
 }

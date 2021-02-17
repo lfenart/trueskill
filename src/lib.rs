@@ -38,6 +38,14 @@ impl<F: Float> TrueSkill<F> {
         }
     }
 
+    pub fn mu(&self) -> F {
+        self.mu
+    }
+
+    pub fn sigma(&self) -> F {
+        self.sigma
+    }
+
     pub fn beta(&self) -> F {
         self.beta
     }

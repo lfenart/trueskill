@@ -32,8 +32,9 @@ where
             team.as_ref()
                 .iter()
                 .fold((F::zero(), F::zero()), |(mu, sigma2), x: &Rating<F>| {
-                    (mu + x.mu(), sigma2 + x.sigma().powf(F::from(2.).unwrap()))
+                    let sigma = x.sigma();
+                    (mu + x.mu(), sigma2 + sigma * sigma)
                 });
-        Rating::new(F::from(mu).unwrap(), F::from(sigma2.sqrt()).unwrap())
+        Rating::new(mu, sigma2.sqrt())
     }
 }

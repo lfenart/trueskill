@@ -13,7 +13,7 @@ pub fn update<F: Float>(
         let (new_team2, new_team1) = update(env, team2, team1, Score::Win);
         return (new_team1, new_team2);
     }
-    let player_count = team1.len() + team2.len();
+    let player_count = F::from(team1.len() + team2.len()).unwrap();
     let tau = env.tau();
     let add_dynamic_factor = |x: &Rating<F>| {
         let sigma = x.sigma();
@@ -27,7 +27,7 @@ pub fn update<F: Float>(
     let player2: Rating<F> = (&team2).into();
     let sigma1 = player1.sigma();
     let sigma2 = player2.sigma();
-    let c2 = F::from(player_count).unwrap() * beta * beta + sigma1 * sigma1 + sigma2 * sigma2;
+    let c2 = player_count * beta * beta + sigma1 * sigma1 + sigma2 * sigma2;
     let c = c2.sqrt();
     let delta = player1.mu() - player2.mu();
     let (v, w) = {
@@ -43,11 +43,11 @@ pub fn update<F: Float>(
         let sigma = x.sigma();
         let sigma2 = sigma * sigma;
         let mu = x.mu() + mult * sigma2 / c * v;
-        let sigma = (sigma2 * (F::from(1).unwrap() - sigma2 / c2 * w)).sqrt();
+        let sigma = (sigma2 * (F::one() - sigma2 / c2 * w)).sqrt();
         Rating::new(mu, sigma)
     };
-    let new_team1 = team1.iter().map(|x| f(x, F::from(1).unwrap())).collect();
-    let new_team2 = team2.iter().map(|x| f(x, F::from(-1).unwrap())).collect();
+    let new_team1 = team1.iter().map(|x| f(x, F::one())).collect();
+    let new_team2 = team2.iter().map(|x| f(x, -F::one())).collect();
     (new_team1, new_team2)
 }
 
@@ -78,9 +78,9 @@ fn w_draw<F: Float>(t: F, epsilon: F) -> F {
             .unwrap()
 }
 
-fn draw_margin<F: Float>(draw_probability: F, n: usize, beta: F) -> F {
+fn draw_margin<F: Float>(draw_probability: F, n: F, beta: F) -> F {
     let normal = Normal::new(0f64, 1f64).unwrap();
     F::from(normal.inverse_cdf((1f64 + draw_probability.to_f64().unwrap()) / 2f64)).unwrap()
-        * F::from(n).unwrap().sqrt()
+        * n.sqrt()
         * beta
 }

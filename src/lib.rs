@@ -86,9 +86,12 @@ mod tests {
         );
     }
 
+    fn epsilon<F: Float>() -> F {
+        F::from(0.001).unwrap()
+    }
+
     fn check_rating<F: Float>(rating: Rating<F>, (mu, sigma): (F, F)) -> bool {
-        (rating.mu() - mu).abs() < F::from(0.001).unwrap()
-            && (rating.sigma() - sigma).abs() < F::from(0.001).unwrap()
+        (rating.mu() - mu).abs() < epsilon() && (rating.sigma() - sigma).abs() < epsilon()
     }
 
     #[test]
@@ -97,7 +100,7 @@ mod tests {
         let team1 = [Rating::new(2.2, 1.7), Rating::new(36.7, 1.0)];
         let team2 = [Rating::new(20.3, 5.0), Rating::new(17.0, 7.3)];
         let quality = env.quality(&team1, &team2);
-        assert!((quality - 0.671).abs() < 0.001)
+        assert!((quality - 0.671).abs() < epsilon())
     }
 
     #[test]

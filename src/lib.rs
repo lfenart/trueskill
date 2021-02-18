@@ -28,6 +28,7 @@ pub enum Score {
 }
 
 impl<F: Float> TrueSkill<F> {
+    #[inline]
     pub fn new(mu: F, sigma: F, beta: F, tau: F, draw_probability: F) -> Self {
         Self {
             mu,
@@ -38,38 +39,47 @@ impl<F: Float> TrueSkill<F> {
         }
     }
 
+    #[inline]
     pub fn mu(&self) -> F {
         self.mu
     }
 
+    #[inline]
     pub fn sigma(&self) -> F {
         self.sigma
     }
 
+    #[inline]
     pub fn beta(&self) -> F {
         self.beta
     }
 
+    #[inline]
     pub fn tau(&self) -> F {
         self.tau
     }
 
+    #[inline]
     pub fn draw_probability(&self) -> F {
         self.draw_probability
     }
 
+    #[inline]
     pub fn create_rating(&self) -> Rating<F> {
         Rating::new(self.mu, self.sigma)
     }
 
+    #[inline]
     pub fn quality(&self, team1: &[Rating<F>], team2: &[Rating<F>]) -> F {
         matchmaking::quality(self, team1, team2)
     }
 
+    #[inline]
     pub fn balance(&self, players: &[Rating<F>]) -> (Vec<usize>, Vec<usize>) {
         matchmaking::balance(self, players)
     }
 
+    #[inline]
     pub fn update(
         &self,
         team1: &[Rating<F>],
@@ -85,13 +95,13 @@ mod tests {
     use super::*;
 
     fn env<F: Float>() -> TrueSkill<F> {
-        return TrueSkill::new(
+        TrueSkill::new(
             F::from(25).unwrap(),
-            F::from(25f32 / 3f32).unwrap(),
-            F::from(25f32 / 6f32).unwrap(),
-            F::from(25f32 / 300f32).unwrap(),
+            F::from(25. / 3.).unwrap(),
+            F::from(25. / 6.).unwrap(),
+            F::from(25. / 300.).unwrap(),
             F::from(0.1).unwrap(),
-        );
+        )
     }
 
     fn epsilon<F: Float>() -> F {

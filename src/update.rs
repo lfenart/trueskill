@@ -42,9 +42,9 @@ pub fn update<F: Float>(
     let f = |x: &Rating<F>, mult: F| {
         let sigma = x.sigma();
         let sigma2 = sigma * sigma;
-        let mu = x.mu() + mult * sigma2 / c * v;
-        let sigma = (sigma2 * (F::one() - sigma2 / c2 * w)).sqrt();
-        Rating::new(mu, sigma)
+        let new_mu = x.mu() + mult * sigma2 / c * v;
+        let new_sigma = (sigma2 * (F::one() - sigma2 / c2 * w)).sqrt();
+        Rating::new(new_mu, new_sigma)
     };
     let new_team1 = team1.iter().map(|x| f(x, F::one())).collect();
     let new_team2 = team2.iter().map(|x| f(x, -F::one())).collect();
@@ -52,13 +52,13 @@ pub fn update<F: Float>(
 }
 
 fn v<F: Float>(t: F, epsilon: F) -> F {
-    let normal = Normal::new(0f64, 1f64).unwrap();
+    let normal = Normal::new(0., 1.).unwrap();
     let x = (t - epsilon).to_f64().unwrap();
     F::from(normal.pdf(x) / normal.cdf(x)).unwrap()
 }
 
 fn v_draw<F: Float>(t: F, epsilon: F) -> F {
-    let normal = Normal::new(0f64, 1f64).unwrap();
+    let normal = Normal::new(0., 1.).unwrap();
     let x1 = (-epsilon - t).to_f64().unwrap();
     let x2 = (epsilon - t).to_f64().unwrap();
     F::from((normal.pdf(x1) - normal.pdf(x2)) / (normal.cdf(x2) - normal.cdf(x1))).unwrap()
@@ -69,18 +69,20 @@ fn w<F: Float>(t: F, epsilon: F) -> F {
 }
 
 fn w_draw<F: Float>(t: F, epsilon: F) -> F {
-    let normal = Normal::new(0f64, 1f64).unwrap();
+    let normal = Normal::new(0., 1.).unwrap();
     let v = v_draw(t, epsilon);
     let x1 = (epsilon - t).to_f64().unwrap();
     let x2 = (epsilon + t).to_f64().unwrap();
     v * v
-        + F::from((x1 * normal.pdf(x1) + x2 * normal.pdf(x2)) / (normal.cdf(x1) - normal.cdf(-x2)))
-            .unwrap()
+        + F::from(
+            x1.mul_add(normal.pdf(x1), x2 * normal.pdf(x2)) / (normal.cdf(x1) - normal.cdf(-x2)),
+        )
+        .unwrap()
 }
 
 fn draw_margin<F: Float>(draw_probability: F, n: F, beta: F) -> F {
-    let normal = Normal::new(0f64, 1f64).unwrap();
-    F::from(normal.inverse_cdf((1f64 + draw_probability.to_f64().unwrap()) / 2f64)).unwrap()
+    let normal = Normal::new(0., 1.).unwrap();
+    F::from(normal.inverse_cdf((1. + draw_probability.to_f64().unwrap()) / 2.)).unwrap()
         * n.sqrt()
         * beta
 }

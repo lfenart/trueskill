@@ -5,8 +5,11 @@ mod update;
 pub use rating::Rating;
 
 use num_traits::Float;
+#[cfg(feature = "serde")]
+use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, PartialEq)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct TrueSkill<F>
 where
     F: Float,

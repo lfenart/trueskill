@@ -189,6 +189,21 @@ mod test {
     }
 
     #[test]
+    fn update_loss() {
+        let mut team1 = TEAM1;
+        let mut team2 = TEAM2;
+        TRUESKILL.update(&mut team1, &mut team2, Score::Loss);
+        assert_almost_eq!(team1[0].mean(), 0.9283660862362771, 1e-15);
+        assert_almost_eq!(team1[1].mean(), 3.6678791270954667, 1e-15);
+        assert_almost_eq!(team2[0].mean(), 2.201877393334128, 1e-15);
+        assert_almost_eq!(team2[1].mean(), 2.9623643524749386, 1e-15);
+        assert_almost_eq!(team1[0].variance(), 0.1067360228558045, 1e-15);
+        assert_almost_eq!(team1[1].variance(), 0.43983797890865656, 1e-15);
+        assert_almost_eq!(team2[0].variance(), 0.2840770079704802, 1e-15);
+        assert_almost_eq!(team2[1].variance(), 0.5740189356703336, 1e-15);
+    }
+
+    #[test]
     fn quality() {
         let quality = TRUESKILL.quality(&TEAM1, &TEAM2);
         assert_almost_eq!(quality, 0.5910630134064284, 1e-15);

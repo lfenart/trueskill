@@ -1,11 +1,7 @@
 use std::iter::FromIterator;
 
-use once_cell::sync::Lazy;
-use statrs::distribution::{Continuous, ContinuousCDF, Normal};
-
 use super::{Rating, Score};
-
-static NORMAL: Lazy<Normal> = Lazy::new(|| Normal::new(0.0, 1.0).unwrap());
+use crate::utils::{cdf, inverse_cdf, pdf};
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct TrueSkill {
@@ -109,7 +105,7 @@ impl TrueSkill {
     #[inline]
     fn vw(t: f64, epsilon: f64) -> [f64; 2] {
         let x = t - epsilon;
-        let v = NORMAL.pdf(x) / NORMAL.cdf(x);
+        let v = pdf(x) / cdf(x);
         let w = v * (v + x);
         [v, w]
     }
@@ -118,15 +114,15 @@ impl TrueSkill {
     fn vw_draw(t: f64, epsilon: f64) -> [f64; 2] {
         let x1 = -epsilon - t;
         let x2 = epsilon - t;
-        let den = NORMAL.cdf(x2) - NORMAL.cdf(x1);
-        let v = (NORMAL.pdf(x1) - NORMAL.pdf(x2)) / den;
-        let w = v * v + (x2 * NORMAL.pdf(x2) - x1 * NORMAL.pdf(-x1)) / den;
+        let den = cdf(x2) - cdf(x1);
+        let v = (pdf(x1) - pdf(x2)) / den;
+        let w = v * v + (x2 * pdf(x2) - x1 * pdf(-x1)) / den;
         [v, w]
     }
 
     #[inline]
     fn draw_margin(draw_probability: f64, n: f64, beta: f64) -> f64 {
-        NORMAL.inverse_cdf((1.0 + draw_probability) / 2.0) * n.sqrt() * beta
+        inverse_cdf((1.0 + draw_probability) / 2.0) * n.sqrt() * beta
     }
 }
 

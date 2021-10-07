@@ -1,11 +1,7 @@
 use std::iter::FromIterator;
 
-use once_cell::sync::Lazy;
-use statrs::distribution::{Continuous, ContinuousCDF, Normal};
-
 use super::{Rating, Score};
-
-static NORMAL: Lazy<Normal> = Lazy::new(|| Normal::new(0.0, 1.0).unwrap());
+use crate::utils::{cdf, pdf};
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct SimpleTrueSkill {
@@ -100,7 +96,7 @@ impl SimpleTrueSkill {
 
     #[inline]
     fn vw(x: f64) -> [f64; 2] {
-        let v = NORMAL.pdf(x) / NORMAL.cdf(x);
+        let v = pdf(x) / cdf(x);
         let w = v * (v + x);
         [v, w]
     }

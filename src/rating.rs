@@ -87,3 +87,52 @@ impl<'a> FromIterator<&'a Self> for Rating {
         iter.into_iter().sum()
     }
 }
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    static MEAN: f64 = 3.0;
+    static VARIANCE: f64 = 0.5;
+    static RATING: Rating = Rating::new(MEAN, VARIANCE);
+    static RATING2: Rating = Rating::new(2.0, 1.0);
+
+    #[test]
+    fn mean() {
+        assert_eq!(RATING.mean(), MEAN);
+    }
+
+    #[test]
+    fn variance() {
+        assert_eq!(RATING.variance(), VARIANCE);
+    }
+
+    #[test]
+    fn add() {
+        let rating = RATING + RATING2;
+        assert_eq!(rating.mean(), MEAN + RATING2.mean());
+        assert_eq!(rating.variance(), VARIANCE + RATING2.variance());
+    }
+
+    #[test]
+    fn from_iter() {
+        let ratings = [RATING, RATING2];
+        let rating = Rating::from_iter(ratings.iter());
+        assert_eq!(rating.mean(), MEAN + RATING2.mean());
+        assert_eq!(rating.variance(), VARIANCE + RATING2.variance());
+    }
+
+    #[cfg(feature = "serde")]
+    #[test]
+    fn serialize() {
+        let text = serde_json::to_string(&RATING).unwrap();
+        assert_eq!(text, r#"{"mean":3.0,"variance":0.5}"#);
+    }
+
+    #[cfg(feature = "serde")]
+    #[test]
+    fn deserialize() {
+        let rating = serde_json::from_str::<Rating>(r#"{"mean":3.0,"variance":0.5}"#).unwrap();
+        assert_eq!(rating, RATING);
+    }
+}

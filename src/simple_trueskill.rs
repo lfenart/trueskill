@@ -3,7 +3,11 @@ use core::iter::FromIterator;
 use super::{Rating, Score};
 use crate::utils::{cdf, pdf};
 
+#[cfg(feature = "serde")]
+use serde::{Deserialize, Serialize};
+
 #[derive(Debug, Clone, Copy, PartialEq)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct SimpleTrueSkill {
     mu: f64,
     sigma: f64,
@@ -186,5 +190,22 @@ mod test {
     fn quality() {
         let quality = TRUESKILL.quality(&TEAM1, &TEAM2);
         assert_almost_eq!(quality, 0.5910630134064284, 1e-15);
+    }
+
+    #[cfg(feature = "serde")]
+    #[test]
+    fn serialize() {
+        let text = serde_json::to_string(&TRUESKILL).unwrap();
+        assert_eq!(text, r#"{"mu":3.0,"sigma":1.0,"beta":0.5,"tau":0.1}"#);
+    }
+
+    #[cfg(feature = "serde")]
+    #[test]
+    fn deserialize() {
+        let trueskill = serde_json::from_str::<SimpleTrueSkill>(
+            r#"{"mu":3.0,"sigma":1.0,"beta":0.5,"tau":0.1}"#,
+        )
+        .unwrap();
+        assert_eq!(trueskill, TRUESKILL);
     }
 }

@@ -90,6 +90,8 @@ impl<'a> FromIterator<&'a Self> for Rating {
 
 #[cfg(test)]
 mod test {
+    use statrs::assert_almost_eq;
+
     use super::*;
 
     static MEAN: f64 = 3.0;
@@ -99,27 +101,27 @@ mod test {
 
     #[test]
     fn mean() {
-        assert_eq!(RATING.mean(), MEAN);
+        assert_almost_eq!(RATING.mean(), MEAN, 1e-15);
     }
 
     #[test]
     fn variance() {
-        assert_eq!(RATING.variance(), VARIANCE);
+        assert_almost_eq!(RATING.variance(), VARIANCE, 1e-15);
     }
 
     #[test]
     fn add() {
         let rating = RATING + RATING2;
-        assert_eq!(rating.mean(), MEAN + RATING2.mean());
-        assert_eq!(rating.variance(), VARIANCE + RATING2.variance());
+        assert_almost_eq!(rating.mean(), MEAN + RATING2.mean(), 1e-15);
+        assert_almost_eq!(rating.variance(), VARIANCE + RATING2.variance(), 1e-15);
     }
 
     #[test]
     fn from_iter() {
         let ratings = [RATING, RATING2];
         let rating = Rating::from_iter(ratings.iter());
-        assert_eq!(rating.mean(), MEAN + RATING2.mean());
-        assert_eq!(rating.variance(), VARIANCE + RATING2.variance());
+        assert_almost_eq!(rating.mean(), MEAN + RATING2.mean(), 1e-15);
+        assert_almost_eq!(rating.variance(), VARIANCE + RATING2.variance(), 1e-15);
     }
 
     #[cfg(feature = "serde")]

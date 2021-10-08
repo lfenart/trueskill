@@ -1,3 +1,5 @@
+#![no_std]
+
 mod rating;
 mod score;
 mod simple_trueskill;

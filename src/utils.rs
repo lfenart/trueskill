@@ -1,5 +1,5 @@
+use core::f64;
 use statrs::function::erf;
-use std::f64;
 
 #[inline]
 pub fn cdf(x: f64) -> f64 {

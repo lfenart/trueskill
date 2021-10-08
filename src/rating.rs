@@ -1,6 +1,6 @@
-use std::iter::FromIterator;
-use std::iter::Sum;
-use std::ops::{Add, AddAssign};
+use core::iter::FromIterator;
+use core::iter::Sum;
+use core::ops::{Add, AddAssign};
 
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};

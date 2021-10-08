@@ -1,4 +1,4 @@
-use std::iter::FromIterator;
+use core::iter::FromIterator;
 
 use super::{Rating, Score};
 use crate::utils::{cdf, inverse_cdf, pdf};

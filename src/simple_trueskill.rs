@@ -101,6 +101,7 @@ impl SimpleTrueSkill {
     #[inline]
     fn vw(x: f64) -> [f64; 2] {
         let v = pdf(x) / cdf(x);
+        let v = if v.is_nan() { -x } else { v };
         let w = v * (v + x);
         [v, w]
     }
